@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserManagement from "./pages/UserManagement";
 
 function App() {
   return (
@@ -17,6 +18,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <UserManagement />
           </ProtectedRoute>
         }
       />

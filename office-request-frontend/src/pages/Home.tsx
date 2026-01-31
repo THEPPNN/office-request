@@ -3,7 +3,9 @@ import CreateRequestModal from "../components/ui/CreateRequestModal";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 dayjs.locale("th");
+
 import { typeConvert } from "../types/requestType";
+import LogoutButton from "../components/LogoutButton";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
@@ -46,9 +48,12 @@ export default function Home() {
           <h1 className="text-2xl font-bold">👋 Welcome</h1>
           <p className="text-gray-500">Today: {dayjs().format("DD MMM YYYY")}</p>
         </div>
-        <button onClick={() => setOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded-md">+ สร้างคำขอ</button>
+        <LogoutButton />
       </div>
 
+      <div className="flex justify-center">
+        <button onClick={() => setOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded-md">+ สร้างคำขอ</button>
+      </div>
       <CreateRequestModal
         open={open}
         onClose={() => setOpen(false)}
