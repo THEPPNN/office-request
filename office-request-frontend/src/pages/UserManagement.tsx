@@ -21,7 +21,6 @@ export default function UserManagement() {
     try {
       const res = await axios.get(`${API_URL}/users`);
       setUsers(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     } finally {

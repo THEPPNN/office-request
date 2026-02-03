@@ -36,7 +36,6 @@ export default function AdminDashboard() {
       const res = await axios.get(`${API_URL}/requests`);
       setRequests(res.data.requests);
       setStats(res.data.stats);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     }

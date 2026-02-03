@@ -28,7 +28,6 @@ export default function Login() {
         if(res.token) {
             authStorage.setAuth(res.token, res.user.role , res.user.id);
             const path = redirectByRole(res.user.role);
-            console.log('path', path);
             navigate(path, { replace: true });
         } else {
             setError("Invalid email or password");

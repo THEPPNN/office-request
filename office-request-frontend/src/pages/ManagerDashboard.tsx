@@ -13,7 +13,6 @@ export default function ManagerDashboard() {
   const fetchRequests = async () => {
     try {
       const res = await axios.get(`${API_URL}/requests`);
-      console.log('res', res.data.requests);
       setRequests(res.data.requests);
     } catch (err) {
       console.error(err);

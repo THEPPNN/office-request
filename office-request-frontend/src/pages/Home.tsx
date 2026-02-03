@@ -64,33 +64,34 @@ export default function Home() {
       <div className="bg-white rounded-xl shadow p-4">
         <h2 className="font-semibold mb-3">ประวัติคำขอของคุณ</h2>
 
-        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 text-left text-sm font-semibold">ลำดับ</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">ประเภทคำขอ</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">ตั้งแต่วันที่</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">ถึงวันที่</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((request, index) => (
-              <tr key={request.id} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2">{index + 1}</td>
-                <td className="px-4 py-2">{typeConvert[request.type as keyof typeof typeConvert]}</td>
-                <td className="px-4 py-2">{dayjs(request.startDate).format("DD MMM YYYY")}</td>
-                <td className="px-4 py-2">{dayjs(request.endDate).format("DD MMM YYYY")}</td>
-                <td className="px-4 py-2">
-                  <span className={`px-2 py-1 text-sm rounded ${statusStyle[request.status as keyof typeof statusStyle]}`}>
-                    {request.status}
-                  </span>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 text-left text-sm font-semibold">ลำดับ</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold">ประเภทคำขอ</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold">ตั้งแต่วันที่</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold">ถึงวันที่</th>
+                <th className="px-4 py-2 text-left text-sm font-semibold">สถานะ</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
+            </thead>
+            <tbody>
+              {requests.map((request, index) => (
+                <tr key={request.id} className="border-t hover:bg-gray-50">
+                  <td className="px-4 py-2">{index + 1}</td>
+                  <td className="px-4 py-2">{typeConvert[request.type as keyof typeof typeConvert]}</td>
+                  <td className="px-4 py-2">{dayjs(request.startDate).format("DD MMM YYYY")}</td>
+                  <td className="px-4 py-2">{dayjs(request.endDate).format("DD MMM YYYY")}</td>
+                  <td className="px-4 py-2">
+                    <span className={`px-2 py-1 text-sm rounded ${statusStyle[request.status as keyof typeof statusStyle]}`}>
+                      {request.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

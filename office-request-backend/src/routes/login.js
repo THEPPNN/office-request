@@ -8,7 +8,6 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email, status: "ACTIVE" } });
-  console.log('user', user);
   if (!user) {
     return res.status(401).json({ message: "Invalid email or password" });
   }
