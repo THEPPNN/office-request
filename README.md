@@ -1,6 +1,6 @@
 # 👑 User Management System (React + Node.js)
 
-![All Page](./office-screenshort.png)
+![All Page](./screenshort/office-screenshort.png)
 
 โปรเจกต์นี้เป็น **Demo Project สำหรับการเรียนรู้และใช้ประกอบการสมัครงาน**  
 ออกแบบมาเพื่อแสดงทักษะการพัฒนา **Frontend + Backend + Database** แบบ Full Stack
