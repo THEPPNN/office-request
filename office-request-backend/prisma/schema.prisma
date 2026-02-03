@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  role      Role     @default(USER)
+  status    Status   @default(ACTIVE)
+  requests  Request[]
+  password  String?   // ✅ nullable
+  createdAt DateTime @default(now())
+}
+
+model Request {
+  id        Int      @id @default(autoincrement())
+  type      RequestType
+  startDate DateTime
+  endDate   DateTime
+  note      String?
+  status    RequestStatus @default(PENDING)
+  approveId Int?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  MANAGER
+  ADMIN
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum RequestType {
+  SICK
+  BUSINESS
+  VACATION
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

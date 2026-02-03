@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateRequestModal from "../components/ui/CreateRequestModal";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
@@ -6,7 +6,8 @@ dayjs.locale("th");
 
 import { typeConvert } from "../types/requestType";
 import LogoutButton from "../components/LogoutButton";
-
+import axios from "axios";
+import { authStorage } from "../utils/authStorage";
 export default function Home() {
   const [open, setOpen] = useState(false);
 
@@ -15,30 +16,30 @@ export default function Home() {
     pending: "bg-yellow-100 text-yellow-700",
     rejected: "bg-red-100 text-red-700",
   };
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  });
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
-  const mockRequests = [
-    {
-      id: 2,
-      type: "sick",
-      startDate: "2026-01-30",
-      endDate: "2026-01-30",
-      status: "pending",
-    },
-    {
-      id: 2,
-      type: "sick",
-      startDate: "2026-01-29",
-      endDate: "2026-01-29",
-      status: "pending",
-    },
-    {
-      id: 1,
-      type: "vacation",
-      startDate: "2026-01-01",
-      endDate: "2026-01-03",
-      status: "approved",
-    },
-  ];
+  const fetchRequests = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/requests?userId=${authStorage.getId()}`);
+      setRequests(res.data.requests);
+      setStats(res.data.stats);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -50,7 +51,7 @@ export default function Home() {
         </div>
         <LogoutButton />
       </div>
-
+      <button onClick={fetchRequests} id="fetch-requests" className="hidden">Fetch Requests</button>
       <div className="flex justify-center">
         <button onClick={() => setOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded-md">+ สร้างคำขอ</button>
       </div>
@@ -74,7 +75,7 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {mockRequests.map((request, index) => (
+            {requests.map((request, index) => (
               <tr key={request.id} className="border-t hover:bg-gray-50">
                 <td className="px-4 py-2">{index + 1}</td>
                 <td className="px-4 py-2">{typeConvert[request.type as keyof typeof typeConvert]}</td>

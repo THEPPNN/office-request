@@ -26,8 +26,9 @@ export default function Login() {
         const res = await authService.login({ email, password });
         setLoading(false);
         if(res.token) {
-            authStorage.setAuth(res.token, res.user.role);
+            authStorage.setAuth(res.token, res.user.role , res.user.id);
             const path = redirectByRole(res.user.role);
+            console.log('path', path);
             navigate(path, { replace: true });
         } else {
             setError("Invalid email or password");

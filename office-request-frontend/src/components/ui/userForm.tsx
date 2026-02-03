@@ -1,8 +1,9 @@
 // userForm.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelectInput from "./SelectInput";
 import Input from "./Input";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 export default function UserForm({
     onSuccess,
@@ -11,121 +12,145 @@ export default function UserForm({
     onSuccess: () => void;
     initialData?: any;
 }) {
-    const [name, setName] = useState(initialData?.name || "");
-    const [email, setEmail] = useState(initialData?.email || "");
-    const [role, setRole] = useState(initialData?.role || "");
 
     const [loading, setLoading] = useState(false);
     const [emailError, setEmailError] = useState("");
 
-    const submit = async () => {
-        if (!name || !email || !role) {
-            Swal.fire({
-                title: "กรุณากรอกข้อมูลให้ครบ",
-                icon: "error",
-            });
-            return;
-        }
+    const [error, setError] = useState("");
+    const API_URL = import.meta.env.VITE_API_URL;
 
-        if (!isValidEmail(email)) {
-            Swal.fire({
-                title: "อีเมลไม่ถูกต้อง",
-                text: "กรุณากรอกอีเมลให้ถูกต้อง เช่น user@email.com",
-                icon: "warning",
-            });
-            return;
-        }
-
-        setLoading(true);
-
-        if (initialData) {
-            // ✏️ EDIT
-            Swal.fire({
-                title: "แก้ไขสำเร็จ",
-                text: "อัปเดตข้อมูลผู้ใช้งานแล้ว",
-                html: `<div>
-                    <p><strong>ID:</strong> ${initialData.id}</p>
-                    <p><strong>ชื่อ:</strong> ${name}</p>
-                    <p><strong>อีเมล:</strong> ${email}</p>
-                    <p><strong>สิทธิ์:</strong> ${role}</p>
-                </div>`,
-                icon: "success",
-            }).then(() => {
-                setLoading(false);
-                onSuccess();
-            });
-        } else {
-            // ➕ CREATE
-            Swal.fire({
-                title: "สร้างผู้ใช้งานสำเร็จ",
-                text: "ผู้ใช้งานของคุณถูกสร้างสำเร็จ",
-                html: `<div>
-                    <p><strong>ชื่อ:</strong> ${name}</p>
-                    <p><strong>อีเมล:</strong> ${email}</p>
-                    <p><strong>สิทธิ์:</strong> ${role}</p>
-                </div>`,
-                icon: "success",
-            }).then(() => {
-                setLoading(false);
-                onSuccess();
-            });
-        }
-    };
 
     const isValidEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        role: "",
+        password: ""
+    });
+
+    const isEdit = !!initialData;
+    useEffect(() => {
+        if (initialData) {
+            setForm({
+                name: initialData.name,
+                email: initialData.email,
+                role: initialData.role,
+                password: "",
+            });
+        }
+    }, [initialData]);
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            if (isEdit) {
+                // 🔵 EDIT
+                let res = await axios.put(`${API_URL}/users/${initialData.id}`, form);
+                if (res.status === 200) {
+                    onSuccess?.();
+                    Swal.fire({
+                        title: "แจ้งเตือน",
+                        icon: "success",
+                        text: "บันทึกการแก้ไขสำเร็จ 🎉",
+                    });
+                } else {
+                    setError(res.data.message);
+                }
+            } else {
+                // 🟢 CREATE
+                let res = await axios.post(`${API_URL}/users`, form);
+                if (res.status === 201) {
+                    onSuccess?.();
+                    Swal.fire({
+                        title: "แจ้งเตือน",
+                        icon: "success",
+                        text: "สร้างผู้ใช้สำเร็จ 🎉",
+                    });
+                    setForm({
+                        name: "",
+                        email: "",
+                        role: "",
+                        password: ""
+                    });
+                } else {
+                    setError(res.data.message);
+                }
+            }
+
+            onSuccess();
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
-        <div className="space-y-4">
-            <div className="form-group">
-                <label className="block mb-1 text-sm">ชื่อ</label>
-                <Input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-            </div>
-            <div className="form-group">
-                <label className="block mb-1 text-sm">อีเมล</label>
-                <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        setEmail(value);
+        <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="space-y-4">
+                <div className="form-group">
+                    <label className="block mb-1 text-sm">ชื่อ</label>
+                    <Input
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="block mb-1 text-sm">อีเมล</label>
+                    <Input
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setForm({ ...form, email: value })
 
-                        if (!isValidEmail(value)) {
-                            setEmailError("รูปแบบอีเมลไม่ถูกต้อง");
-                        } else {
-                            setEmailError("");
-                        }
-                    }}
-                />
-                {emailError && (
-                    <p className="text-red-500 text-xs mt-1">{emailError}</p>
-                )}
-            </div>
-            <div className="form-group">
-                <label className="block mb-1 text-sm">สิทธิ์</label>
-                <SelectInput
-                    options={[
-                        { label: "พนักงาน", value: "user" },
-                        { label: "ผู้จัดการ", value: "manager" },
-                        { label: "ผู้ดูแลระบบ", value: "admin" },
-                    ]}
-                    value={role}
-                    onChange={(value) => setRole(value)}
-                />
-            </div>
+                            if (!isValidEmail(value)) {
+                                setEmailError("รูปแบบอีเมลไม่ถูกต้อง");
+                            } else {
+                                setEmailError("");
+                            }
+                        }}
+                    />
+                    {emailError && (
+                        <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                    )}
+                </div>
+                <div className="form-group">
+                    <label className="block mb-1 text-sm">รหัสผ่าน
 
-            <button
-                onClick={submit}
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 rounded"
-            >
-                {loading ? "กำลังส่ง..." : "สร้างผู้ใช้งาน"}
-            </button>
-        </div>
+                        {isEdit && <small className="text-gray-500 text-xs"> หากต้องการเปลี่ยนรหัสผ่าน กรอกรหัสผ่านใหม่</small>}
+                    </label>
+                    <Input
+                        type="password"
+                        onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="block mb-1 text-sm">สิทธิ์</label>
+                    <SelectInput
+                        options={[
+                            { label: "พนักงาน", value: "USER" },
+                            { label: "ผู้จัดการ", value: "MANAGER" },
+                            { label: "ผู้ดูแลระบบ", value: "ADMIN" },
+                        ]}
+                        value={form.role}
+                        onChange={(value) => setForm({ ...form, role: value })}
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 text-white py-2 rounded"
+                >
+                    {isEdit ? "บันทึกการแก้ไข" : "สร้างผู้ใช้งาน"} {loading ? "กำลังดำเนินการ..." : ""}
+                </button>
+                {error && <p className="text-red-500 text-center text-xs mt-1">{error}</p>}
+            </div>
+        </form>
     );
 }
