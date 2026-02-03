@@ -41,6 +41,12 @@ export default function Home() {
     }
   };
 
+  const requestStatus = (status: string) => {
+    if (status === "PENDING") return "bg-yellow-100 text-yellow-700";
+    if (status === "APPROVED") return "bg-green-100 text-green-700";
+    if (status === "REJECTED") return "bg-red-100 text-red-700";
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -83,7 +89,7 @@ export default function Home() {
                   <td className="px-4 py-2">{dayjs(request.startDate).format("DD MMM YYYY")}</td>
                   <td className="px-4 py-2">{dayjs(request.endDate).format("DD MMM YYYY")}</td>
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 text-sm rounded ${statusStyle[request.status as keyof typeof statusStyle]}`}>
+                    <span className={`px-2 py-1 text-sm rounded ${requestStatus(request.status)}`}>
                       {request.status}
                     </span>
                   </td>
